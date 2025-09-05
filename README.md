@@ -16,7 +16,7 @@
 ### On the simple but powerful Arch Linux.
 ![hi](previews/arch.png)
 
-[Extra wallpapers (place inside /wallpapers)](https://files.catbox.moe/4a80y7.zip)
+[Extra wallpapers (extract & place inside /wallpapers)](https://files.catbox.moe/4a80y7.zip)
 
 ### Introduction 
 
