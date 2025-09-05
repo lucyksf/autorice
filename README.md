@@ -118,5 +118,5 @@ With those three points laid out, here are some basic keybindings to help you ou
 
 **Please** open an issue and tell me what happened. My goal is to make this work for everyone and that starts with fixing every little problem people have.
 
-## Even 6 years later in this fork, I will try to help. -lucyksf
+# Even 6 years later in this fork, I will try to help. -lucyksf
 
