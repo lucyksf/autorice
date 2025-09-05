@@ -5,12 +5,14 @@ export LINKDOT=$PWD
 
 # Install fonts and programs. Including two WMs, a terminal emulator
 # App launcher, screenshot tool, pdf viewer, image viewer, and text editor.
-sudo pacman -S ttf-joypixels ttf-croscore noto-fonts-cjk noto-fonts \
+sudo pacman -S ttf-croscore noto-fonts-cjk noto-fonts \
     ttf-fantasque-sans-mono ttf-linux-libertine rofi mpv maim \
-    alacritty alacritty-terminfo compton neofetch dash neovim \
-    feh sxhkd bspwm i3-gaps dunst zathura-pdf-mupdf libnotify \
+    alacritty alacritty-terminfo picom dash neovim \
+    feh sxhkd bspwm i3-gaps polybar dunst zathura-pdf-mupdf libnotify \
     diff-so-fancy zsh-autosuggestions zsh-syntax-highlighting \
-    xorg-server xorg-xinit xorg-xprop pulseaudio-alsa exa xclip
+    xorg-server xorg-xinit xorg-xprop pulseaudio-alsa eza xclip
+
+yay -S ttf-joypixels
 
 read -p "-- For music, use mpd + ncmpcpp instead of cmus? [y/N] " yna
 case $yna in
@@ -52,14 +54,18 @@ mkdir -p ~/.config ~/.aurpkgs ~/Images/Captures ~/Images/Wallpapers \
 mv -n wallpapers/* ~/Images/Wallpapers
 
 # Clone the aur packages being installed. Polybar and Oh-My-Zsh
-git clone https://aur.archlinux.org/oh-my-zsh-git.git ~/.aurpkgs/oh-my-zsh-git
-git clone https://aur.archlinux.org/polybar.git ~/.aurpkgs/polybar
+# git clone https://aur.archlinux.org/oh-my-zsh-git.git ~/.aurpkgs/oh-my-zsh-git
+# git clone https://aur.archlinux.org/polybar.git ~/.aurpkgs/polybar
+# ^ not working, replaced by the polybar package ^
 
 # Install them
-cd ~/.aurpkgs/oh-my-zsh-git
-makepkg -si
-cd ~/.aurpkgs/polybar
-makepkg -si
+# cd ~/.aurpkgs/oh-my-zsh-git
+# makepkg -si
+# cd ~/.aurpkgs/polybar
+# makepkg -si
+
+# Install oh-my-zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 # Link all dotfiles into their appropriate locations
 cd ~
