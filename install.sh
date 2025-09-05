@@ -47,7 +47,7 @@ sudo install -Dm 644 other/dashbinsh.hook /usr/share/libalpm/hooks/
 sudo install -Dm 644 other/50-mouse-acceleration.conf /etc/X11/xorg.conf.d/
 
 # Make some folders. Screenshots will go in the captures folder.
-mkdir -p ~/.config ~/.aurpkgs ~/Images/Captures ~/Images/Wallpapers \
+mkdir -p ~/.config ~/Images/Captures ~/Images/Wallpapers \
     $LINKDOT/config/mpd/playlists ~/Music
 
 # Move provided wallpapers to the wallpapers folder
