@@ -1,5 +1,5 @@
-ZSH=/usr/share/oh-my-zsh/
-$ZSH_CUSTOM/themes/
+ZSH="$HOME/.oh-my-zsh"
+ZSH_CUSTOM="$ZSH/custom"
 ZSH_THEME="mytheme"
 DISABLE_AUTO_UPDATE="false"
 FZF_BASE="/usr/share/fzf"
