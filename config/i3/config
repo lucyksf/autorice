@@ -1,11 +1,10 @@
-
 #
-#  ██╗██████╗ 
+#  ██╗██████╗
 #  ██║╚════██╗
 #  ██║ █████╔╝
 #  ██║ ╚═══██╗
 #  ██║██████╔╝
-#  ╚═╝╚═════╝ 
+#  ╚═╝╚═════╝
 #
 #  https://github.com/i3/i3
 #
@@ -158,7 +157,7 @@ bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
-bindsym $mod+Shift+e exec i3-msg exit 
+bindsym $mod+Shift+e exec i3-msg exit
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
@@ -189,17 +188,25 @@ bindsym $mod+r mode "resize"
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
-# Polybar used instead 
+# Polybar used instead
 #bar {
 #        status_command i3status
 #}
 
-for_window [class=".*"] border pixel 0
-gaps inner 25
-gaps top 25 
+for_window [class=".*"] border pixel 3
+gaps inner 17
+gaps top 17
+
+# Border colors         border  backgr. text    indic.  child_border
+client.focused          #E6E68E #E6E68E #ffffff #E6E68E #E6E68E
+client.unfocused        #666666 #666666 #aaaaaa #666666 #666666
+client.focused_inactive #3b4252 #3b4252 #d8dee9 #3b4252 #3b4252
+client.urgent           #bf616a #bf616a #eceff4 #bf616a #bf616a
 
 # The first three will not be run on i3 restart. This is to avoid memory problems.
-exec --no-startup-id compton --config ~/.config/compton/i3compton.conf 
-exec --no-startup-id polybar i3 
+exec --no-startup-id compton --config ~/.config/compton/i3compton.conf
+exec --no-startup-id polybar i3
 exec --no-startup-id sxhkd
-exec_always --no-startup-id feh --no-fehbg --randomize --bg-fill ~/Images/Wallpapers
+exec --no-startup-id dunst
+exec --no-startup-id apulse vesktop
+exec_always --no-startup-id feh --no-fehbg --bg-fill ~/Images/Wallpapers/mountain.jpg
