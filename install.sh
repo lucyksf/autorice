@@ -10,9 +10,9 @@ sudo pacman -S ttf-croscore noto-fonts-cjk noto-fonts \
     alacritty alacritty-terminfo picom dash neovim \
     feh sxhkd bspwm i3-gaps polybar dunst zathura-pdf-mupdf libnotify \
     diff-so-fancy zsh-autosuggestions zsh-syntax-highlighting \
-    xorg-server xorg-xinit xorg-xprop pulseaudio-alsa eza xclip apulse
+    xorg-server xorg-xinit xorg-xprop pulseaudio-alsa eza xclip
 
-yay -S ttf-joypixels
+yay -S ttf-joypixels apulse
 
 read -p "-- For music, use mpd + ncmpcpp instead of cmus? [y/N] " yna
 case $yna in
