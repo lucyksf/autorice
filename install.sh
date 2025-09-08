@@ -10,7 +10,7 @@ sudo pacman -S ttf-croscore noto-fonts-cjk noto-fonts \
     alacritty alacritty-terminfo picom dash neovim \
     feh sxhkd bspwm i3-gaps polybar dunst zathura-pdf-mupdf libnotify \
     diff-so-fancy zsh-autosuggestions zsh-syntax-highlighting \
-    xorg-server xorg-xinit xorg-xprop pulseaudio-alsa eza xclip
+    xorg-server xorg-xinit xorg-xprop pulseaudio-alsa eza xclip thefuck
 
 yay -S ttf-joypixels apulse
 
