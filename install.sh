@@ -67,7 +67,8 @@ mv -n wallpapers/* ~/Images/Wallpapers
 # Install oh-my-zsh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 mkdir -p ~/.oh-my-zsh/custom/themes
-mv "$LINKDOT/config/zsh/themes/mytheme.zsh-theme" ~/.oh-my-zsh/custom/themes/
+cp "$LINKDOT/config/zsh/themes/"*.zsh-theme ~/.oh-my-zsh/custom/themes/
+cp "$LINKDOT/config/zsh/themes/"*.zsh ~/.oh-my-zsh/custom/
 
 # Link all dotfiles into their appropriate locations
 : 'cd ~/
