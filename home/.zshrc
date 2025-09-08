@@ -22,4 +22,20 @@ alias neofetch='echo "\n\n" && neofetch && echo "\n"'
 
 ZSH_CACHE_DIR=$HOME/.cache/oh-my-zsh
 
-if [[ ! -d $ZSH_CACHE_DIR ]]; then mkdir $ZSH_CACHE_DIR fi [[ -f "$ZSH/oh-my-zsh.sh" ]] \ && source $ZSH/oh-my-zsh.sh autoload -U colors && colors [[ -f "/usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] \ && source "/usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" [[ -f "/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] \ && source "/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+if [[ ! -d $ZSH_CACHE_DIR ]]; then
+  mkdir -p "$ZSH_CACHE_DIR"
+fi
+
+if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
+  source "$ZSH/oh-my-zsh.sh"
+fi
+
+autoload -U colors && colors
+
+if [[ -f "/usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
+  source "/usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+fi
+
+if [[ -f "/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+  source "/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+fi
