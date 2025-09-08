@@ -25,6 +25,8 @@ sudo pacman -S ttf-croscore noto-fonts-cjk noto-fonts \
 
 yay -S ttf-joypixels apulse
 
+read -p "-- For music, use mpd + ncmpcpp instead of cmus? [y/N] " yna case $yna in [Yy]* ) sudo pacman -S mpd ncmpcpp patch home/.xinitrc < other/add-mpd.patch ;; * ) sudo pacman -S cmus;; esac # Optionally install some more programs. Including a file manager, # find, cat, grep, and curl replacements. And a powerful image viewer. read -p "-- Install extras? (nnn fd bat ripgrep httpie sxiv fzf) [Y/n] " ynb case $ynb in ''|[Yy]* ) sudo pacman -S nnn fd bat ripgrep httpie sxiv fzf patch home/.zshrc < other/add-fzf.patch ;; * ) echo "-- Extras Skipped";; esac
+
 # helper: move existing target to backup
 backup_and_move() {
   local target="$1"
