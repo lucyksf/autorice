@@ -70,10 +70,45 @@ mkdir -p ~/.oh-my-zsh/custom/themes
 mv ~/.config/zsh/themes/mytheme.zsh-theme ~/.oh-my-zsh/custom/themes/
 
 # Link all dotfiles into their appropriate locations
-cd ~
+: 'cd ~/
 ln -sf $LINKDOT/home/.* .
 
 cd ~/.config
 ln -sf $LINKDOT/config/* .
+'
+
+# Link dotfiles from $LINKDOT/home into ~
+cd ~
+for item in "$LINKDOT"/home/.[!.]*; do
+    name=$(basename "$item")
+
+    # Skip . and .. just in case
+    [ "$name" = "." ] && continue
+    [ "$name" = ".." ] && continue
+
+    # If target exists and is a directory, skip (you'll handle configs separately)
+    if [ -d "$item" ]; then
+        echo "-- Skipping directory $name (handled elsewhere)"
+        continue
+    fi
+
+    ln -sf "$item" "$HOME/$name"
+    echo "-- Linked $name"
+done
+
+# Link config directories
+mkdir -p ~/.config
+for item in "$LINKDOT"/config/*; do
+    name=$(basename "$item")
+
+    # If the config already exists, back it up
+    if [ -e "$HOME/.config/$name" ]; then
+        mv "$HOME/.config/$name" "$HOME/.config/$name.backup"
+        echo "-- Backed up existing $name"
+    fi
+
+    ln -sf "$item" "$HOME/.config/$name"
+    echo "-- Linked config $name"
+done
 
 echo "-- Installation Complete! Restart the computer."
