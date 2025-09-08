@@ -1,10 +1,21 @@
-#!/bin/sh
+#!/usr/bin/env bash
+# install.sh  -- safe installer for autorice
+# Run with: bash ./install.sh (must use bash)
 
-# Export the path to this directory for later use in the script
-export LINKDOT=$PWD
+set -uo pipefail
 
-# Install fonts and programs. Including two WMs, a terminal emulator
-# App launcher, screenshot tool, pdf viewer, image viewer, and text editor.
+LINKDOT="${LINKDOT:-$PWD}"
+BACKUP_DIR="${BACKUP_DIR:-$HOME/dotfiles_backup/$(date +%Y%m%d%H%M%S)}"
+mkdir -p "$BACKUP_DIR"
+
+echo "autorice installer"
+echo "  repo root: $LINKDOT"
+echo "  backups:   $BACKUP_DIR"
+echo
+
+# Require bash-only features (nullglob, dotglob)
+shopt -s nullglob dotglob
+
 sudo pacman -S ttf-croscore noto-fonts-cjk noto-fonts \
     ttf-fantasque-sans-mono ttf-linux-libertine rofi mpv maim \
     alacritty alacritty-terminfo picom dash neovim \
@@ -14,102 +25,130 @@ sudo pacman -S ttf-croscore noto-fonts-cjk noto-fonts \
 
 yay -S ttf-joypixels apulse
 
-read -p "-- For music, use mpd + ncmpcpp instead of cmus? [y/N] " yna
-case $yna in
-    [Yy]* ) sudo pacman -S mpd ncmpcpp
-        patch home/.xinitrc < other/add-mpd.patch
-        ;;
-    * ) sudo pacman -S cmus;;
-esac
+# helper: move existing target to backup
+backup_and_move() {
+  local target="$1"
+  if [ -e "$target" ] || [ -L "$target" ]; then
+    local bn
+    bn="$(basename "$target")"
+    local dest="$BACKUP_DIR/${bn}.$(date +%s).backup"
+    echo "  backing up $target -> $dest"
+    mv "$target" "$dest"
+  fi
+}
 
-# Optionally install some more programs. Including a file manager,
-# find, cat, grep, and curl replacements. And a powerful image viewer.
-read -p "-- Install extras? (nnn fd bat ripgrep httpie sxiv fzf) [Y/n] " ynb
-case $ynb in
-    ''|[Yy]* ) sudo pacman -S nnn fd bat ripgrep httpie sxiv fzf
-        patch home/.zshrc < other/add-fzf.patch
-        ;;
-    * ) echo "-- Extras Skipped";;
-esac
+# 1) Link home dotfiles (files only). Skip .config here.
+if [ -d "$LINKDOT/home" ]; then
+  echo "Linking files from $LINKDOT/home -> ~"
+  for src in "$LINKDOT/home"/.[!.]* "$LINKDOT/home"/..?*; do
+    [ -e "$src" ] || continue
+    base="$(basename "$src")"
+    # avoid . and ..
+    [[ "$base" = "." || "$base" = ".." ]] && continue
+    # skip .config (handled later)
+    if [ "$base" = ".config" ]; then
+      echo "  skipping .config (handled via config/)"
+      continue
+    fi
+    # skip directories in home/ (only link files)
+    if [ -d "$src" ]; then
+      echo "  skipping directory $base (home/ should contain files only)"
+      continue
+    fi
 
-# Link dash to /bin/sh for performance boost.
-# Then link several font config files for better font display.
-sudo ln -sfT dash /usr/bin/sh
-sudo ln -sf /etc/fonts/conf.avail/75-joypixels.conf /etc/fonts/conf.d/
-sudo ln -sf /etc/fonts/conf.avail/70-no-bitmaps.conf /etc/fonts/conf.d/
-sudo ln -sf /etc/fonts/conf.avail/10-sub-pixel-rgb.conf /etc/fonts/conf.d/
-sudo ln -sf /etc/fonts/conf.avail/11-lcdfilter-default.conf /etc/fonts/conf.d/
-
-# Misc but important. The last disables mouse acceleration and can be removed.
-sudo install -Dm 644 other/freetype2.sh /etc/profile.d/
-sudo install -Dm 644 other/local.conf /etc/fonts/
-sudo install -Dm 644 other/dashbinsh.hook /usr/share/libalpm/hooks/
-sudo install -Dm 644 other/50-mouse-acceleration.conf /etc/X11/xorg.conf.d/
-
-# Make some folders. Screenshots will go in the captures folder.
-mkdir -p ~/.config ~/Images/Captures ~/Images/Wallpapers \
-    $LINKDOT/config/mpd/playlists ~/Music
-
-# Move provided wallpapers to the wallpapers folder
-mv -n wallpapers/* ~/Images/Wallpapers
-
-# Clone the aur packages being installed. Polybar and Oh-My-Zsh
-# git clone https://aur.archlinux.org/oh-my-zsh-git.git ~/.aurpkgs/oh-my-zsh-git
-# git clone https://aur.archlinux.org/polybar.git ~/.aurpkgs/polybar
-# ^ not working, replaced by the polybar package ^
-
-# Install them
-# cd ~/.aurpkgs/oh-my-zsh-git
-# makepkg -si
-# cd ~/.aurpkgs/polybar
-# makepkg -si
-
-# Install oh-my-zsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-mkdir -p ~/.oh-my-zsh/custom/themes
-cp "$LINKDOT/config/zsh/themes/"*.zsh-theme ~/.oh-my-zsh/custom/themes/
-cp "$LINKDOT/config/zsh/themes/"*.zsh ~/.oh-my-zsh/custom/
-
-# Link all dotfiles into their appropriate locations
-: 'cd ~/
-ln -sf $LINKDOT/home/.* .
-
-cd ~/.config
-ln -sf $LINKDOT/config/* .
-'
-
-# Link dotfiles from $LINKDOT/home into ~
-cd ~
-for item in "$LINKDOT"/home/.[!.]*; do
-    name=$(basename "$item")
-
-    # Skip . and .. just in case
-    [ "$name" = "." ] && continue
-    [ "$name" = ".." ] && continue
-
-    # If target exists and is a directory, skip (you'll handle configs separately)
-    if [ -d "$item" ]; then
-        echo "-- Skipping directory $name (handled elsewhere)"
+    dest="$HOME/$base"
+    if [ -L "$dest" ]; then
+      # if it's already the same link -> skip
+      if [ "$(readlink -f "$dest")" = "$(readlink -f "$src")" ]; then
+        echo "  already linked: $dest"
         continue
+      else
+        backup_and_move "$dest"
+      fi
+    elif [ -e "$dest" ]; then
+      backup_and_move "$dest"
     fi
 
-    ln -sf "$item" "$HOME/$name"
-    echo "-- Linked $name"
-done
+    ln -sfn "$src" "$dest"
+    echo "  linked: $dest -> $src"
+  done
+  echo
+fi
 
-# Link config directories
-mkdir -p ~/.config
-for item in "$LINKDOT"/config/*; do
-    name=$(basename "$item")
+# Ensure ~/.config exists
+mkdir -p "$HOME/.config"
 
-    # If the config already exists, back it up
-    if [ -e "$HOME/.config/$name" ]; then
-        mv "$HOME/.config/$name" "$HOME/.config/$name.backup"
-        echo "-- Backed up existing $name"
-    fi
+# 2) Handle everything under config/
+if [ -d "$LINKDOT/config" ]; then
+  echo "Processing config/ -> ~/.config/"
+  for src in "$LINKDOT/config"/*; do
+    [ -e "$src" ] || continue
+    name="$(basename "$src")"
+    dest="$HOME/.config/$name"
 
-    ln -sf "$item" "$HOME/.config/$name"
-    echo "-- Linked config $name"
-done
+    case "$name" in
+      git)
+        # If a specific gitconfig exists, link it to ~/.gitconfig
+        gitcfg=""
+        if [ -f "$src/.gitconfig" ]; then gitcfg="$src/.gitconfig"; fi
+        if [ -f "$src/gitconfig" ]; then gitcfg="$src/gitconfig"; fi
 
-echo "-- Installation Complete! Restart the computer."
+        if [ -n "$gitcfg" ]; then
+          if [ -e "$HOME/.gitconfig" ] || [ -L "$HOME/.gitconfig" ]; then
+            backup_and_move "$HOME/.gitconfig"
+          fi
+          ln -sfn "$gitcfg" "$HOME/.gitconfig"
+          echo "  linked: ~/.gitconfig -> $gitcfg"
+        else
+          # fallback: symlink whole directory to ~/.config/git
+          if [ -e "$dest" ] || [ -L "$dest" ]; then
+            backup_and_move "$dest"
+          fi
+          ln -sfn "$src" "$dest"
+          echo "  linked: $dest -> $src"
+        fi
+        ;;
+
+      zsh)
+        # Symlink config/zsh -> ~/.config/zsh
+        if [ -e "$HOME/.config/zsh" ] || [ -L "$HOME/.config/zsh" ]; then
+          backup_and_move "$HOME/.config/zsh"
+        fi
+        ln -sfn "$src" "$HOME/.config/zsh"
+        echo "  linked: ~/.config/zsh -> $src"
+
+        # Ensure Oh My Zsh exists (clone if missing)
+        if [ ! -d "$HOME/.oh-my-zsh" ]; then
+          echo "  oh-my-zsh not found -> cloning to ~/.oh-my-zsh"
+          git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git "$HOME/.oh-my-zsh" 2>/dev/null || true
+        fi
+
+        # Copy themes and aliases into oh-my-zsh/custom/
+        if [ -d "$src/themes" ]; then
+          mkdir -p "$HOME/.oh-my-zsh/custom/themes"
+          cp -a "$src/themes/"*.zsh-theme "$HOME/.oh-my-zsh/custom/themes/" 2>/dev/null || true
+          echo "  copied zsh themes -> ~/.oh-my-zsh/custom/themes/"
+        fi
+        if [ -f "$src/themes/aliases.zsh" ]; then
+          mkdir -p "$HOME/.oh-my-zsh/custom"
+          cp -a "$src/themes/aliases.zsh" "$HOME/.oh-my-zsh/custom/" 2>/dev/null || true
+          echo "  copied aliases.zsh -> ~/.oh-my-zsh/custom/"
+        fi
+        ;;
+
+      *)
+        # Default: symlink the config folder into ~/.config/<name>
+        if [ -e "$dest" ] || [ -L "$dest" ]; then
+          backup_and_move "$dest"
+        fi
+        ln -sfn "$src" "$dest"
+        echo "  linked: $dest -> $src"
+        ;;
+    esac
+  done
+  echo
+fi
+
+echo "Installation complete."
+echo "Backups (if any) are in: $BACKUP_DIR"
+echo "If something looks off, you can restore items from the backup directory."
