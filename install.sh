@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# install.sh  -- safe installer for autorice
-# Run with: bash ./install.sh (must use bash)
 
 set -uo pipefail
 
