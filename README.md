@@ -60,7 +60,7 @@ Programs have been chosen carefully based on their performance and utility. At t
 This little script will install a collection of command line tools, two window managers, and a terminal emulator. Installation is easy:
 
 1. Install Arch Linux and make sure you have `base-devel` and `git` packages.
-2. `git clone https://github.com/lucyksf/autorice .dotfiles`
+2. `git clone https://github.com/lucysixsixsix/autorice .dotfiles`
 3. `cd .dotfiles` (You **must** be inside the cloned directory)
 4. `sh install.sh`
 5. Restart your computer after the script finishes.
@@ -119,5 +119,5 @@ With those three points laid out, here are some basic keybindings to help you ou
 
 **Please** open an issue and tell me what happened. My goal is to make this work for everyone and that starts with fixing every little problem people have.
 
-### Even 6 years later in this fork, I will try to help. -lucyksf
+### Even 6 years later in this fork, I will try to help. -lucy
 
